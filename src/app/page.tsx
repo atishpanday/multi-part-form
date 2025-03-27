@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import InitialInformation from "./_components/initial-information";
 import AdditionalInformation from "./_components/additional-information";
 import FinalInformation from "./_components/final-information";
@@ -44,6 +44,7 @@ export default function Home() {
     formState: { errors },
     handleSubmit,
     getValues,
+    setValue,
   } = useForm<FieldValues>({
     defaultValues: getInitialFormData(),
   });
@@ -53,7 +54,6 @@ export default function Home() {
   };
 
   const handleNext = () => {
-    // Wrap the next step logic in handleSubmit to ensure validation
     handleSubmit((data) => {
       setStep(step + 1);
       saveToLocalStorage(data);
@@ -66,6 +66,18 @@ export default function Home() {
       saveToLocalStorage(getValues());
     }
   };
+
+  const getParsedData = async () => {
+    const response = await fetch("/api/parsed-data");
+    const data = await response.json();
+    setValue("name", data.name);
+    setValue("email", data.email);
+    setValue("phone", data.phone);
+  };
+
+  useEffect(() => {
+    getParsedData();
+  }, []);
 
   return (
     <div className="w-1/2 h-screen mx-auto my-4 p-4 shadow-md rounded-lg">
